@@ -12,11 +12,9 @@ import ru.relex.minisocialnetwork.mapper.UserMapper;
 import ru.relex.minisocialnetwork.model.dto.UserDto;
 import ru.relex.minisocialnetwork.model.dto.UserPasswordDto;
 import ru.relex.minisocialnetwork.model.dto.UserRegistrationDto;
-import ru.relex.minisocialnetwork.model.dto.view.UserForListDto;
 import ru.relex.minisocialnetwork.model.dto.view.UserViewDto;
 import ru.relex.minisocialnetwork.model.entity.UserEntity;
 import ru.relex.minisocialnetwork.repository.UserRepository;
-import ru.relex.minisocialnetwork.service.PaginationService;
 import ru.relex.minisocialnetwork.service.UserService;
 
 import java.util.Objects;

@@ -6,7 +6,6 @@ import org.mapstruct.MappingTarget;
 import org.mapstruct.Named;
 import ru.relex.minisocialnetwork.model.dto.UserDetailsDto;
 import ru.relex.minisocialnetwork.model.dto.UserDto;
-import ru.relex.minisocialnetwork.model.dto.UserPasswordDto;
 import ru.relex.minisocialnetwork.model.dto.UserRegistrationDto;
 import ru.relex.minisocialnetwork.model.dto.view.UserForListDto;
 import ru.relex.minisocialnetwork.model.dto.view.UserViewDto;

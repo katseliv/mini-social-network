@@ -19,7 +19,6 @@ import ru.relex.minisocialnetwork.model.response.JwtResponse;
 import ru.relex.minisocialnetwork.model.response.LoginResponse;
 import ru.relex.minisocialnetwork.service.AuthService;
 import ru.relex.minisocialnetwork.utils.SecurityContextFacade;
-import springfox.documentation.annotations.ApiIgnore;
 
 import javax.security.auth.message.AuthException;
 import javax.validation.Valid;
