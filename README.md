@@ -6,11 +6,11 @@
 - Регистрация и авторизация
 - Профиль пользователя
 - Социальная часть
-- Дополнительные возможности
+- Дополнительные функции
 - Используемые технологии
-- Установка и запуск
-- Примеры REST-запросов
-- Лицензия
+- Установка и запуск приложения
+- REST API
+- Автор
 
 ## Основные функции
 
@@ -63,9 +63,9 @@ cd messenger-api
 Документацию по REST API можно найти в Swagger UI по адресу `http://localhost:8080/swagger-ui.html`.
 
 ### Примеры запросов
-Регистрация нового пользователя
-http
-Copy code
+
+#### Регистрация нового пользователя
+```
 POST /api/register
 Content-Type: application/json
 
@@ -76,9 +76,10 @@ Content-Type: application/json
     "firstName": "John",
     "lastName": "Doe"
 }
-Вход в систему
-http
-Copy code
+```
+
+#### Вход в систему
+```
 POST /api/login
 Content-Type: application/json
 
@@ -86,10 +87,10 @@ Content-Type: application/json
     "email": "user@example.com",
     "password": "securePassword"
 }
+```
 
-Отправка сообщения
-http
-Copy code
+#### Отправка сообщения
+```
 POST /api/messages/send
 Content-Type: application/json
 Authorization: Bearer <ваш_токен>
@@ -98,9 +99,10 @@ Authorization: Bearer <ваш_токен>
     "recipientNickname": "friend123",
     "message": "Привет, друг!"
 }
-Обновление данных профиля
-http
-Copy code
+```
+
+#### Обновление данных профиля
+```
 PUT /api/profile/update
 Content-Type: application/json
 Authorization: Bearer <ваш_токен>
@@ -111,8 +113,10 @@ Authorization: Bearer <ваш_токен>
     "lastName": "Name",
     "email": "new@example.com"
 }
-Автор
-Ваше имя
+```
+
+## Автор
+Екатерина Селиванова
 
 Лицензия
 Этот проект лицензируется в соответствии с лицензией XYZ. Подробности см. в файле LICENSE.
