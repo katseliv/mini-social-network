@@ -66,21 +66,22 @@ cd messenger-api
 
 #### Регистрация нового пользователя
 ```
-POST /api/register
+POST /api/v1/users/register
 Content-Type: application/json
 
 {
+    "username": "user123",
+    "firstName": "John",
+    "lastName": "Doe",
     "email": "user@example.com",
     "password": "securePassword",
-    "nickname": "user123",
-    "firstName": "John",
-    "lastName": "Doe"
+    "passwordConfirmation": "securePassword"
 }
 ```
 
 #### Вход в систему
 ```
-POST /api/login
+POST /api/v1/login
 Content-Type: application/json
 
 {
@@ -91,36 +92,33 @@ Content-Type: application/json
 
 #### Отправка сообщения
 ```
-POST /api/messages/send
+POST /api/v1/messages
 Content-Type: application/json
 Authorization: Bearer <ваш_токен>
 
 {
-    "recipientNickname": "friend123",
+    "receiverUsername": "friend123",
     "message": "Привет, друг!"
 }
 ```
 
 #### Обновление данных профиля
 ```
-PUT /api/profile/update
+PUT /api/v1/users
 Content-Type: application/json
 Authorization: Bearer <ваш_токен>
 
 {
-    "nickname": "newNickname",
+    "username": "newUsername",
     "firstName": "New",
     "lastName": "Name",
-    "email": "new@example.com"
+    "email": "new@example.com",
+    "base64StringAvatar": "newBase64StringAvatar",
+    "status": "newStatus",
+    "bio": "newBio",
 }
 ```
 
 ## Автор
 Екатерина Селиванова
 
-Лицензия
-Этот проект лицензируется в соответствии с лицензией XYZ. Подробности см. в файле LICENSE.
-
-Copy code
-
-Помимо этого примера, не забудьте документировать ваши API-эндпоинты и предоставить приме
