@@ -1,0 +1,28 @@
+databaseChangeLog:
+  - preConditions:
+      - dbms:
+          type: postgresql
+  - changeSet:
+      id: MSN-001-202310181250
+      author: EkaterinaSelivanova
+      comment: Create Initial DB Structure
+      changes:
+        - sqlFile:
+            path: MSN-001-202310181250.sql
+            relativeToChangelogFile: true
+  - changeSet:
+      id: MSN-001-202310201705
+      author: EkaterinaSelivanova
+      comment: Add a new attribute to the table users
+      changes:
+        - sqlFile:
+            path: MSN-001-202310201705.sql
+            relativeToChangelogFile: true
+  - changeSet:
+      id: MSN-001-202310202155
+      author: EkaterinaSelivanova
+      comment: Add a new attribute to the table users
+      changes:
+        - sqlFile:
+            path: MSN-001-202310202155.sql
+            relativeToChangelogFile: true
