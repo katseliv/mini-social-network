@@ -9,6 +9,7 @@ import lombok.*;
 @AllArgsConstructor
 public class FriendForListDto {
 
+    private final String username;
     private final String firstName;
     private final String lastName;
     private final String status;

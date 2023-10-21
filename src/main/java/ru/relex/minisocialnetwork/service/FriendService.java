@@ -8,11 +8,13 @@ import java.util.List;
 
 public interface FriendService {
 
-    int createFriend(int userId, int friendId);
+    int createFriend(String userEmail, int friendId);
 
-    void hideFriendsList(int userId);
+    void hideFriendsList(String userEmail);
 
-    ViewListPage<FriendForListDto> getViewListPage(int userId, String page, String size);
+    ViewListPage<FriendForListDto> getViewListPageOfFriends(String userEmail, String page, String size);
+
+    ViewListPage<FriendForListDto> getViewListPageOfOtherUserFriends(int userId, String page, String size);
 
     List<FriendForListDto> listFriends(int userId, Pageable pageable);
 

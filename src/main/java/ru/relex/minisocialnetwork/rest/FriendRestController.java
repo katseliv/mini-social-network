@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.relex.minisocialnetwork.model.dto.UserDetailsDto;
 import ru.relex.minisocialnetwork.model.dto.view.FriendForListDto;
 import ru.relex.minisocialnetwork.model.dto.view.ViewListPage;
 import ru.relex.minisocialnetwork.service.FriendService;
@@ -22,30 +21,27 @@ public class FriendRestController {
 
     @PostMapping("/{friendId}")
     public ResponseEntity<Integer> createFriend(@PathVariable final int friendId) {
-        final UserDetailsDto userDetailsDto = (UserDetailsDto) securityContextFacade.getContext().getAuthentication().getPrincipal();
-        final int userId = userDetailsDto.getId();
-        final int id = friendService.createFriend(userId, friendId);
+        final String userEmail = (String) securityContextFacade.getContext().getAuthentication().getPrincipal();
+        final int id = friendService.createFriend(userEmail, friendId);
         return new ResponseEntity<>(id, HttpStatus.CREATED);
     }
 
     @PutMapping("/hide")
     public ResponseEntity<String> hideFriendsList() {
-        final UserDetailsDto userDetailsDto = (UserDetailsDto) securityContextFacade.getContext().getAuthentication().getPrincipal();
-        final int userId = userDetailsDto.getId();
-        friendService.hideFriendsList(userId);
+        final String userEmail = (String) securityContextFacade.getContext().getAuthentication().getPrincipal();
+        friendService.hideFriendsList(userEmail);
         return new ResponseEntity<>("Friends list was hidden!", HttpStatus.OK);
     }
 
     @GetMapping("/list")
     public ViewListPage<FriendForListDto> getFriends(@RequestParam(required = false) final Map<String, String> allParams) {
-        final UserDetailsDto userDetailsDto = (UserDetailsDto) securityContextFacade.getContext().getAuthentication().getPrincipal();
-        final int userId = userDetailsDto.getId();
-        return friendService.getViewListPage(userId, allParams.get("page"), allParams.get("size"));
+        final String userEmail = (String) securityContextFacade.getContext().getAuthentication().getPrincipal();
+        return friendService.getViewListPageOfFriends(userEmail, allParams.get("page"), allParams.get("size"));
     }
 
     @GetMapping("/view/{userId}")
     public ViewListPage<FriendForListDto> getOtherUserFriends(@PathVariable final int userId, @RequestParam(required = false) final Map<String, String> allParams) {
-        return friendService.getViewListPage(userId, allParams.get("page"), allParams.get("size"));
+        return friendService.getViewListPageOfOtherUserFriends(userId, allParams.get("page"), allParams.get("size"));
     }
 
 }

@@ -67,7 +67,7 @@ cd mini-social-network
 4. Приложение будет доступно по адресу http://localhost:8080.
 
 ## REST API
-Документацию по REST API можно найти в Swagger UI по адресу `http://localhost:8080/swagger-ui`.
+Документацию по REST API можно найти в Swagger UI по адресу http://localhost:8080/swagger-ui/.
 
 ### Примеры запросов
 
@@ -123,6 +123,28 @@ Authorization: Bearer <ваш_токен>
     "base64StringAvatar": "newBase64StringAvatar",
     "status": "newStatus",
     "bio": "newBio",
+}
+```
+
+#### Получение списка друзей другого пользователя
+```http
+GET /api/v1/friends/view/{id}
+Content-Type: application/json
+Authorization: Bearer <ваш_токен>
+
+{
+    "pageNumber": 0,
+    "pageSize": 0,
+    "totalCount": 0,
+    "totalPages": 0,
+    "viewDtoList": [
+        {
+            "username": "string",
+            "firstName": "string",
+            "lastName": "string",
+            "status": "string",
+        }
+    ]
 }
 ```
 

@@ -21,7 +21,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Override
     @Transactional(readOnly = true)
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(final String email) throws UsernameNotFoundException {
         final Optional<UserEntity> userEntity = userRepository.findByEmail(email);
         userEntity.ifPresentOrElse(
                 (user) -> log.info("User for email = {} with id = {} has been found.", email, user.getId()),

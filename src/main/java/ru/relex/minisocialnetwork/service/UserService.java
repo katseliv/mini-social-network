@@ -12,10 +12,10 @@ public interface UserService {
 
     UserViewDto getUserViewById(int id);
 
-    void updateUserById(int id, UserDto userDto);
+    void updateUserByEmail(String email, UserDto userDto);
 
-    void updateUserPasswordById(int id, UserPasswordDto userPasswordDto);
+    void updateUserPasswordByEmail(String email, UserPasswordDto userPasswordDto);
 
-    void deleteUserById(int id);
+    void deleteUserByEmail(String email);
 
 }

@@ -39,8 +39,8 @@ public class MessageServiceImpl implements MessageService, PaginationService<Mes
     private final MessageMapper messageMapper;
 
     @Override
-    public int createMessage(int senderId, MessageDto messageDto) {
-        final UserEntity senderEntity = userRepository.findById(senderId)
+    public int createMessage(final String senderEmail, final MessageDto messageDto) {
+        final UserEntity senderEntity = userRepository.findByEmail(senderEmail)
                 .orElseThrow(() -> new EntityNotFoundException("User not found!"));
         final UserEntity receiverEntity = userRepository.findByUsername(messageDto.getReceiverUsername())
                 .orElseThrow(() -> new EntityNotFoundException("User not found!"));
@@ -58,26 +58,29 @@ public class MessageServiceImpl implements MessageService, PaginationService<Mes
     }
 
     @Override
-    public ViewListPage<MessageForListDto> getViewListPage(int senderId, int receiverId, String page, String size) {
+    public ViewListPage<MessageForListDto> getViewListPage(final String senderEmail, final int receiverId, final String page, final String size) {
         final int pageNumber = Optional.ofNullable(page).map(ParseUtils::parsePositiveInteger).orElse(defaultPageNumber);
         final int pageSize = Optional.ofNullable(size).map(ParseUtils::parsePositiveInteger).orElse(defaultPageSize);
 
+        final UserEntity senderEntity = userRepository.findByEmail(senderEmail)
+                .orElseThrow(() -> new EntityNotFoundException("User not found!"));
+
         final Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
-        final List<MessageForListDto> listMessages = listMessages(senderId, receiverId, pageable);
-        final int totalAmount = numberOfMessages(senderId, receiverId);
+        final List<MessageForListDto> listMessages = listMessages(senderEntity.getId(), receiverId, pageable);
+        final int totalAmount = numberOfMessages(senderEntity.getId(), receiverId);
 
         return getViewListPage(totalAmount, pageSize, pageNumber, listMessages);
     }
 
     @Override
-    public List<MessageForListDto> listMessages(int senderId, int receiverId, Pageable pageable) {
+    public List<MessageForListDto> listMessages(final int senderId, final int receiverId, final Pageable pageable) {
         final List<MessageEntity> messageEntities = messageRepository.findAllBySenderIdAndReceiverId(senderId, receiverId, pageable).getContent();
         log.info("There have been found {} messages.", messageEntities.size());
         return messageMapper.messageEntitiesToMessageForListDtoList(messageEntities);
     }
 
     @Override
-    public int numberOfMessages(int senderId, int receiverId) {
+    public int numberOfMessages(final int senderId, final int receiverId) {
         final long numberOfMessages = messageRepository.countBySenderIdAndReceiverId(senderId, receiverId);
         log.info("There have been found {} messages.", numberOfMessages);
         return (int) numberOfMessages;

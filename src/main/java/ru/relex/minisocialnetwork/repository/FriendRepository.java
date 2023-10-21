@@ -9,8 +9,8 @@ import ru.relex.minisocialnetwork.model.entity.FriendEntity;
 @Repository
 public interface FriendRepository extends JpaRepository<FriendEntity, Integer> {
 
-    Page<FriendEntity> findAllByUserIdOrFriendId(int userId, int friendId, Pageable pageable);
+    Page<FriendEntity> findAllByUserId(int userId, Pageable pageable);
 
-    long countByUserIdOrFriendId(int userId, int friendId);
+    long countByUserId(int userId);
 
 }

@@ -31,7 +31,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public int createUser(UserRegistrationDto userRegistrationDto) {
+    public int createUser(final UserRegistrationDto userRegistrationDto) {
         if (userRepository.findByEmail(userRegistrationDto.getEmail()).isPresent()) {
             log.warn("User with email = {} hasn't been created. Such user already exists!", userRegistrationDto.getEmail());
             throw new EntityAlreadyExistsException("User already exists in the database!");
@@ -50,7 +50,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(readOnly = true)
-    public UserViewDto getUserViewById(int id) {
+    public UserViewDto getUserViewById(final int id) {
         final Optional<UserEntity> userEntity = userRepository.findById(id);
         userEntity.ifPresentOrElse(
                 (user) -> log.info("User with id = {} has been found.", user.getId()),
@@ -61,8 +61,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public void updateUserById(int id, UserDto userDto) {
-        final UserEntity userEntity = userRepository.findById(id)
+    public void updateUserByEmail(final String email, final UserDto userDto) {
+        final UserEntity userEntity = userRepository.findByEmail(email)
                 .orElseThrow(() -> new EntityNotFoundException("User not found!"));
 
         final String username = userDto.getUsername();
@@ -74,35 +74,35 @@ public class UserServiceImpl implements UserService {
         if (userDto.getBase64StringAvatar().isEmpty()) {
             userMapper.mergeUserEntityAndUserDtoWithoutPicture(userEntity, userDto);
             userRepository.save(userEntity);
-            log.info("User with id = {} has been updated without picture.", id);
+            log.info("User with email = {} has been updated without picture.", email);
         } else {
             userMapper.mergeUserEntityAndUserDto(userEntity, userDto);
             userRepository.save(userEntity);
-            log.info("User with id = {} has been updated with picture.", id);
+            log.info("User with email = {} has been updated with picture.", email);
         }
     }
 
     @Override
-    public void updateUserPasswordById(int id, UserPasswordDto userPasswordDto) {
-        final UserEntity userEntity = userRepository.findById(id)
+    public void updateUserPasswordByEmail(final String email, final UserPasswordDto userPasswordDto) {
+        final UserEntity userEntity = userRepository.findByEmail(email)
                 .orElseThrow(() -> new EntityNotFoundException("User not found!"));
         final String password = passwordEncoder.encode(userPasswordDto.getPassword());
         userMapper.mergeUserEntityAndUserPasswordDto(userEntity, password);
-        log.info("Password of user with id = {} has been updated.", id);
+        log.info("Password of user with email = {} has been updated.", email);
     }
 
     @Override
     @Transactional
-    public void deleteUserById(int id) {
-        final Optional<UserEntity> userEntity = userRepository.findById(id);
+    public void deleteUserByEmail(final String email) {
+        final Optional<UserEntity> userEntity = userRepository.findByEmail(email);
         userEntity.ifPresentOrElse(
-                (user) -> log.info("User with id = {} has been found.", id),
+                (user) -> log.info("User with email = {} has been found.", email),
                 () -> {
-                    log.warn("User with id = {} hasn't been found.", id);
+                    log.warn("User with email = {} hasn't been found.", email);
                     throw new EntityNotFoundException("User not found!");
                 });
-        userRepository.deleteById(id);
-        log.info("User with id = {} has been deleted.", id);
+        userRepository.deleteByEmail(email);
+        log.info("User with email = {} has been deleted.", email);
     }
 
 }

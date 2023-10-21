@@ -41,11 +41,13 @@ public class FriendServiceImpl implements FriendService, PaginationService<Frien
     private final FriendMapper friendMapper;
 
     @Override
-    public int createFriend(int userId, int friendId) {
-        if (!userRepository.existsById(userId) || !userRepository.existsById(friendId)) {
+    public int createFriend(final String userEmail, final int friendId) {
+        final UserEntity userEntity = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new EntityNotFoundException("User not found!"));
+        if (!userRepository.existsById(friendId)) {
             throw new EntityNotFoundException("User not found!");
         }
-        final FriendDto friendDto = FriendDto.builder().userId(userId).friendId(friendId).build();
+        final FriendDto friendDto = FriendDto.builder().userId(userEntity.getId()).friendId(friendId).build();
         final FriendEntity friendEntity = Optional.of(friendDto)
                 .map(friendMapper::friendDtoToFriendEntity)
                 .map(friend -> {
@@ -59,20 +61,31 @@ public class FriendServiceImpl implements FriendService, PaginationService<Frien
     }
 
     @Override
-    public void hideFriendsList(int userId) {
-        final UserEntity userEntity = userRepository.findById(userId)
+    public void hideFriendsList(final String userEmail) {
+        final UserEntity userEntity = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new EntityNotFoundException("User not found!"));
         userEntity.setHiddenFriendsList(true);
         userRepository.save(userEntity);
     }
 
     @Override
-    public ViewListPage<FriendForListDto> getViewListPage(int userId, String page, String size) {
+    public ViewListPage<FriendForListDto> getViewListPageOfFriends(final String userEmail, final String page, final String size) {
+        UserEntity userEntity = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new EntityNotFoundException("User not found!"));
+        return getViewListPage(userEntity.getId(), page, size);
+    }
+
+    @Override
+    public ViewListPage<FriendForListDto> getViewListPageOfOtherUserFriends(final int userId, final String page, final String size) {
         UserEntity userEntity = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found!"));
         if (userEntity.isHiddenFriendsList()) {
             throw new EntityAccessDeniedException("Friends list was hidden by user!");
         }
+        return getViewListPage(userEntity.getId(), page, size);
+    }
+
+    private ViewListPage<FriendForListDto> getViewListPage(final int userId, final String page, final String size) {
         final int pageNumber = Optional.ofNullable(page).map(ParseUtils::parsePositiveInteger).orElse(defaultPageNumber);
         final int pageSize = Optional.ofNullable(size).map(ParseUtils::parsePositiveInteger).orElse(defaultPageSize);
 
@@ -84,15 +97,15 @@ public class FriendServiceImpl implements FriendService, PaginationService<Frien
     }
 
     @Override
-    public List<FriendForListDto> listFriends(int userId, Pageable pageable) {
-        final List<FriendEntity> friendEntities = friendRepository.findAllByUserIdOrFriendId(userId, userId, pageable).getContent();
+    public List<FriendForListDto> listFriends(final int userId, final Pageable pageable) {
+        final List<FriendEntity> friendEntities = friendRepository.findAllByUserId(userId, pageable).getContent();
         log.info("There have been found {} friends.", friendEntities.size());
         return friendMapper.friendEntitiesToFriendForListDtoList(friendEntities);
     }
 
     @Override
-    public int numberOfFriends(int userId) {
-        final long numberOfFriends = friendRepository.countByUserIdOrFriendId(userId, userId);
+    public int numberOfFriends(final int userId) {
+        final long numberOfFriends = friendRepository.countByUserId(userId);
         log.info("There have been found {} friends.", numberOfFriends);
         return (int) numberOfFriends;
     }

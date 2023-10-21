@@ -3,6 +3,7 @@ package ru.relex.minisocialnetwork.configuration;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -11,31 +12,48 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.AccessDeniedHandlerImpl;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
+import ru.relex.minisocialnetwork.filter.JwtTokenFilter;
 import ru.relex.minisocialnetwork.mapper.UserMapper;
+import ru.relex.minisocialnetwork.provider.JwtTokenProvider;
 import ru.relex.minisocialnetwork.repository.UserRepository;
+import ru.relex.minisocialnetwork.service.JwtTokenService;
 import ru.relex.minisocialnetwork.service.impl.UserDetailsServiceImpl;
+import ru.relex.minisocialnetwork.utils.SecurityContextFacade;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.Collections;
 import java.util.List;
+
+import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
 @RequiredArgsConstructor
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfiguration {
 
+    private final SecurityContextFacade securityContextFacade;
+    private final JwtTokenService jwtTokenService;
+    private final JwtTokenProvider jwtTokenProvider;
     private final UserRepository userRepository;
     private final UserMapper userMapper;
 
     @Bean
-    public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
+    public AuthenticationManager authenticationManager(final HttpSecurity http) throws Exception {
         return http.getSharedObject(AuthenticationManagerBuilder.class)
                 .userDetailsService(userDetailsServiceBean())
                 .passwordEncoder(passwordEncoder())
                 .and()
                 .build();
+    }
+
+    @Bean
+    public JwtTokenFilter jwtTokenFilterBean() {
+        return new JwtTokenFilter(securityContextFacade, userDetailsServiceBean(), jwtTokenService, jwtTokenProvider);
     }
 
     @Bean
@@ -49,14 +67,39 @@ public class WebSecurityConfiguration {
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
+    public SecurityFilterChain filterChain(final HttpSecurity httpSecurity) throws Exception {
         httpSecurity
                 .cors()
                 .and()
                 .csrf()
                 .disable()
                 .authorizeRequests()
-                .anyRequest().permitAll();
+                .antMatchers("/api/v1/login", "/api/v1/new-access-token", "/api/v1/users/register").permitAll()
+                .antMatchers("/api/v1/logout").authenticated()
+                .antMatchers(HttpMethod.GET, "/api/v1/users/{id}").authenticated()
+                .antMatchers(HttpMethod.PUT, "/api/v1/users").authenticated()
+                .antMatchers(HttpMethod.PUT, "/api/v1/users/update-password").authenticated()
+                .antMatchers(HttpMethod.DELETE, "/api/v1/users").authenticated()
+                .antMatchers(HttpMethod.POST, "/api/v1/messages").authenticated()
+                .antMatchers(HttpMethod.GET, "/api/v1/messages/history/{receiverId}").authenticated()
+                .antMatchers(HttpMethod.POST, "/api/v1/friends/{friendId}").authenticated()
+                .antMatchers(HttpMethod.PUT, "/api/v1/friends/hide").authenticated()
+                .antMatchers(HttpMethod.GET, "/api/v1/friends/list").authenticated()
+                .antMatchers(HttpMethod.GET, "/api/v1/friends/view/{userId}").authenticated()
+
+                .and()
+                .exceptionHandling()
+                .accessDeniedHandler(new AccessDeniedHandlerImpl())
+                .authenticationEntryPoint(
+                        (request, response, authException) -> response.sendError(
+                                HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized"))
+
+                .and()
+                .sessionManagement(sm -> sm.sessionCreationPolicy(STATELESS))
+                .addFilterAfter(jwtTokenFilterBean(), UsernamePasswordAuthenticationFilter.class)
+
+                .headers()
+                .cacheControl();
         return httpSecurity.build();
     }
 

@@ -28,7 +28,7 @@ public class JwtTokenServiceImpl implements JwtTokenService {
 
     @Override
     @Transactional
-    public void createJwtToken(JwtTokenDto jwtTokenDto) {
+    public void createJwtToken(final JwtTokenDto jwtTokenDto) {
         final Optional<UserEntity> userEntity = userRepository.findByEmail(jwtTokenDto.getEmail());
         userEntity.ifPresentOrElse(
                 (user) -> {
@@ -52,7 +52,7 @@ public class JwtTokenServiceImpl implements JwtTokenService {
 
     @Override
     @Transactional(readOnly = true)
-    public String getJwtTokenByEmailAndType(String email, JwtTokenType type) {
+    public String getJwtTokenByEmailAndType(final String email, final JwtTokenType type) {
         final Optional<JwtTokenEntity> jwtTokenEntity = jwtTokenRepository.findByUserEmailAndType(email, type);
         jwtTokenEntity.ifPresentOrElse(
                 (token) -> log.info("Token with type = {} for email = {} with id = {} has been found.", type, email, token.getId()),
@@ -62,7 +62,7 @@ public class JwtTokenServiceImpl implements JwtTokenService {
 
     @Override
     @Transactional(readOnly = true)
-    public boolean existsByToken(String token) {
+    public boolean existsByToken(final String token) {
         final boolean existsByToken = jwtTokenRepository.existsByToken(token);
         if (existsByToken) {
             log.info("Token exists.");
@@ -74,7 +74,7 @@ public class JwtTokenServiceImpl implements JwtTokenService {
 
     @Override
     @Transactional(readOnly = true)
-    public boolean existsByUserEmail(String email) {
+    public boolean existsByUserEmail(final String email) {
         final boolean existsByUserEmail = jwtTokenRepository.existsByUserEmailAndType(email, JwtTokenType.ACCESS)
                 && jwtTokenRepository.existsByUserEmailAndType(email, JwtTokenType.REFRESH);
         if (existsByUserEmail) {
@@ -87,7 +87,7 @@ public class JwtTokenServiceImpl implements JwtTokenService {
 
     @Override
     @Transactional
-    public void updateJwtToken(JwtTokenDto jwtTokenDto) {
+    public void updateJwtToken(final JwtTokenDto jwtTokenDto) {
         final JwtTokenEntity jwtTokenEntity = jwtTokenRepository.findByUserEmailAndType(
                 jwtTokenDto.getEmail(), jwtTokenDto.getType()).orElseThrow(() -> {
             log.warn("Token with type = {} for email = {} doesn't exist", jwtTokenDto.getType(), jwtTokenDto.getEmail());
@@ -101,7 +101,7 @@ public class JwtTokenServiceImpl implements JwtTokenService {
 
     @Override
     @Transactional
-    public void deleteJwtTokensByEmail(String email) {
+    public void deleteJwtTokensByEmail(final String email) {
         if (jwtTokenRepository.existsByUserEmailAndType(email, JwtTokenType.ACCESS)
                 && jwtTokenRepository.existsByUserEmailAndType(email, JwtTokenType.REFRESH)) {
             log.info("Tokens for email = {} have been found.", email);

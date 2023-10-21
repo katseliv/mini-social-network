@@ -9,9 +9,9 @@ import java.util.List;
 
 public interface MessageService {
 
-    int createMessage(int senderId, MessageDto messageDto);
+    int createMessage(String senderEmail, MessageDto messageDto);
 
-    ViewListPage<MessageForListDto> getViewListPage(int senderId, int receiverId, String page, String size);
+    ViewListPage<MessageForListDto> getViewListPage(String senderEmail, int receiverId, String page, String size);
 
     List<MessageForListDto> listMessages(int senderId, int receiverId, Pageable pageable);
 

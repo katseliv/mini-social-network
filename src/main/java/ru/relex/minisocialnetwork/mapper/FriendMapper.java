@@ -15,6 +15,7 @@ public interface FriendMapper {
     @Mapping(target = "friend.id", source = "friendId")
     FriendEntity friendDtoToFriendEntity(FriendDto friendDto);
 
+    @Mapping(target = "username", source = "friend.username")
     @Mapping(target = "firstName", source = "friend.firstName")
     @Mapping(target = "lastName", source = "friend.lastName")
     FriendForListDto friendEntityToFriendForListDto(FriendEntity friendEntity);
